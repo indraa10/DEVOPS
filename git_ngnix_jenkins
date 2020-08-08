@@ -25,3 +25,10 @@ nginx=stable # use nginx=development for latest development version
 add-apt-repository ppa:nginx/$nginx
 apt-get update
 apt-get install nginx
+
+once installation done check http://localhost --> if this gives web page then installation is completed
+path where installtion done : 
+/etc/nginx$ ls
+conf.d        fastcgi_params  koi-win     modules-available  nginx.conf    scgi_params      sites-enabled  uwsgi_params
+fastcgi.conf  koi-utf         mime.types  modules-enabled    proxy_params  sites-available  snippets       win-utf
+
