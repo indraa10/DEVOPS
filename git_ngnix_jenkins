@@ -18,6 +18,8 @@ Description:	Ubuntu Groovy Gorilla (development branch)
 Release:	20.10
 Codename:	groovy
 
+https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-18-04
+
 install ngnix for newer version :
 1. switch to root and then run bellow commands.
 
@@ -55,3 +57,57 @@ sudo systemctl disable nginx
 sudo systemctl enable nginx
 
 ----------------------------------------------------------------------------------------------------------------------
+
+https://www.digitalocean.com/community/tutorials/how-to-install-jenkins-on-ubuntu-18-04
+1. install Jenkins : 
+wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
+sudo vi /etc/apt/sources.list , and add below line to the end of the file :
+deb https://pkg.jenkins.io/debian-stable binary/
+sudo apt-get update
+sudo apt-get install jenkins
+
+2. Chnage the port number of the jenkins : 
+file to edit the HTTP_PORT : 
+/etc/default/jenkins
+
+jenkins server administration : 
+sudo systemctl start/stop/restart/status jenkins
+
+allow firewall to open port 9001 which has been assigned by user to open jenkins . 
+
+/etc/default$ sudo ufw status
+Status: inactive
+/etc/default$ sudo ufw allow 9001
+Rules updated
+Rules updated (v6)
+/etc/default$ sudo ufw status
+Status: inactive
+/etc/default$ sudo ufw allow OpenSSH
+Rules updated
+Rules updated (v6)
+/etc/default$ sudo ufw status
+Status: inactive
+/etc/default$ sudo ufw enable
+Firewall is active and enabled on system startup
+/etc/default$ sudo ufw status
+Status: active
+
+To                         Action      From
+--                         ------      ----
+8080                       ALLOW       Anywhere                  
+Nginx HTTP                 ALLOW       Anywhere                  
+9001                       ALLOW       Anywhere                  
+OpenSSH                    ALLOW       Anywhere                  
+8080 (v6)                  ALLOW       Anywhere (v6)             
+Nginx HTTP (v6)            ALLOW       Anywhere (v6)             
+9001 (v6)                  ALLOW       Anywhere (v6)             
+OpenSSH (v6)               ALLOW       Anywhere (v6)             
+
+
+
+
+initially get the admin password : 
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+once plugin installation completed provide username annd login password
+http://localhost:9001/JENKINS
