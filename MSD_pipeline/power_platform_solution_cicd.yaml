@@ -1,0 +1,265 @@
+# ref : https://www.youtube.com/watch?v=Jwio4ejPVm8
+    # Solution Lifecycle Management: The video emphasizes proper solution management across environments
+
+    # Power Platform Build Tools: Uses Microsoft's official build tasks for Power Platform
+
+    # Two-Stage Pipeline: CI (build) and CD (release) separation
+
+    # Service Principal Authentication: Recommended over user credentials
+
+    # Artifact Handling: Solution files are unpacked for source control benefits
+
+# 1. Prerequisites Setup
+
+# Install Power Platform CLI (needed for local development)
+# pac install latest
+
+# 2. CI Pipeline (Build Stage) - azure-pipelines.yml
+
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+trigger:
+- main
+- develop
+
+variables:
+  solutionName: 'YourSolutionName'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+pool:
+  vmImage: 'windows-latest'
+
+stages:
+- stage: Build
+  displayName: 'Build Solution'
+  jobs:
+  - job: Build
+    displayName: 'Build and Export Solution'
+    steps:
+    - task: PowerPlatformToolInstaller@2
+      displayName: 'Install Power Platform CLI'
+      inputs:
+        DefaultVersion: true
+
+    - task: PowerPlatformExportSolution@2
+      displayName: 'Export Solution from DEV'
+      inputs:
+        authenticationType: 'PowerPlatformSPN'
+        PowerPlatformSPN: 'PP_DEV_ServiceConnection'
+        Environment: '$(PowerPlatformDevEnvironmentUrl)'
+        SolutionName: '$(solutionName)'
+        SolutionOutputFile: '$(Build.ArtifactStagingDirectory)\$(solutionName).zip'
+        AsyncOperation: true
+        MaxAsyncWaitTime: 60
+
+    - task: PowerPlatformUnpackSolution@2
+      displayName: 'Unpack Solution'
+      inputs:
+        SolutionInputFile: '$(Build.ArtifactStagingDirectory)\$(solutionName).zip'
+        SolutionTargetFolder: '$(Build.SourcesDirectory)\$(solutionName)'
+        SolutionType: 'Both'
+
+    - task: PowerShell@2
+      displayName: 'Increment Solution Version'
+      inputs:
+        targetType: 'inline'
+        script: |
+          $versionFile = "$(Build.SourcesDirectory)\$(solutionName)\Other\Solution.xml"
+          [xml]$xml = Get-Content $versionFile
+          $versionParts = $xml.ImportExportXml.SolutionManifest.Version.Split('.')
+          $newVersion = "$($versionParts[0]).$($versionParts[1]).$([int]$versionParts[2]+1).0"
+          $xml.ImportExportXml.SolutionManifest.Version = $newVersion
+          $xml.Save($versionFile)
+          Write-Host "##vso[task.setvariable variable=SolutionVersion]$newVersion"
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Solution Artifact'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Source Files'
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)\$(solutionName)'
+        ArtifactName: 'source'
+        publishLocation: 'Container'
+
+
+# 3. CD Pipeline (Release Stage) - release-pipeline.yml
+
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+resources:
+  pipelines:
+  - pipeline: BuildArtifacts
+    source: 'Your.Build.Pipeline.Name'
+    trigger:
+      branches:
+      - main
+      - release/*
+
+stages:
+- stage: DeployToTest
+  displayName: 'Deploy to TEST Environment'
+  condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
+  jobs:
+  - deployment: DeployTest
+    environment: 'PowerPlatform-TEST'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+
+          - task: PowerPlatformToolInstaller@2
+            displayName: 'Install Power Platform CLI'
+
+          - task: PowerPlatformPackSolution@2
+            displayName: 'Pack Solution'
+            inputs:
+              SolutionSourceFolder: '$(Pipeline.Workspace)\source\$(solutionName)'
+              SolutionTargetFile: '$(Pipeline.Workspace)\$(solutionName).zip'
+
+          - task: PowerPlatformImportSolution@2
+            displayName: 'Import Solution to TEST'
+            inputs:
+              authenticationType: 'PowerPlatformSPN'
+              PowerPlatformSPN: 'PP_TEST_ServiceConnection'
+              Environment: '$(PowerPlatformTestEnvironmentUrl)'
+              SolutionInputFile: '$(Pipeline.Workspace)\$(solutionName).zip'
+              OverwriteUnmanagedCustomizations: true
+              SkipDependencyCheck: false
+              AsyncOperation: true
+              MaxAsyncWaitTime: 120
+
+          - task: PowerPlatformPublishCustomizations@2
+            displayName: 'Publish Customizations'
+            inputs:
+              authenticationType: 'PowerPlatformSPN'
+              PowerPlatformSPN: 'PP_TEST_ServiceConnection'
+              Environment: '$(PowerPlatformTestEnvironmentUrl)'
+
+- stage: DeployToProd
+  displayName: 'Deploy to PROD Environment'
+  dependsOn: DeployToTest
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - deployment: DeployProd
+    environment: 'PowerPlatform-PROD'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+
+          - task: PowerPlatformToolInstaller@2
+            displayName: 'Install Power Platform CLI'
+
+          - task: PowerPlatformPackSolution@2
+            displayName: 'Pack Solution'
+            inputs:
+              SolutionSourceFolder: '$(Pipeline.Workspace)\source\$(solutionName)'
+              SolutionTargetFile: '$(Pipeline.Workspace)\$(solutionName).zip'
+
+          - task: PowerPlatformBackupEnvironment@2
+            displayName: 'Backup PROD Environment'
+            inputs:
+              authenticationType: 'PowerPlatformSPN'
+              PowerPlatformSPN: 'PP_PROD_ServiceConnection'
+              Environment: '$(PowerPlatformProdEnvironmentUrl)'
+              BackupLabel: 'PreDeploy_$(solutionName)_$(Build.BuildNumber)'
+
+          - task: PowerPlatformImportSolution@2
+            displayName: 'Import Solution to PROD'
+            inputs:
+              authenticationType: 'PowerPlatformSPN'
+              PowerPlatformSPN: 'PP_PROD_ServiceConnection'
+              Environment: '$(PowerPlatformProdEnvironmentUrl)'
+              SolutionInputFile: '$(Pipeline.Workspace)\$(solutionName).zip'
+              OverwriteUnmanagedCustomizations: true
+              SkipDependencyCheck: false
+              AsyncOperation: true
+              MaxAsyncWaitTime: 120
+
+          - task: PowerPlatformPublishCustomizations@2
+            displayName: 'Publish Customizations'
+            inputs:
+              authenticationType: 'PowerPlatformSPN'
+              PowerPlatformSPN: 'PP_PROD_ServiceConnection'
+              Environment: '$(PowerPlatformProdEnvironmentUrl)'
+
+
+
+# Additional Configuration
+# 1. Environment Variables Setup
+
+# Create variable groups in Azure DevOps Library:
+
+#     PP-DEV-Variables:
+
+#         PowerPlatformDevEnvironmentUrl: https://yourdevorg.crm.dynamics.com
+
+#     PP-TEST-Variables:
+
+#         PowerPlatformTestEnvironmentUrl: https://yourtestorg.crm.dynamics.com
+
+#     PP-PROD-Variables:
+
+#         PowerPlatformProdEnvironmentUrl: https://yourprodorg.crm.dynamics.com
+
+# 2. Service Connections
+
+# Create three service connections (one for each environment) using Service Principal authentication.
+# 3. Approvals and Gates
+
+# Add approval checks before production deployment:
+
+#     In the release pipeline, edit the production stage
+
+#     Click on "Pre-deployment conditions"
+
+#     Enable "Pre-deployment approvals"
+
+#     Specify approvers and notification settings
+
+# Enhanced Features Beyond the Video
+
+#     Automatic Version Increment: PowerShell script to bump version numbers
+
+#     Environment Backup: Automatic PROD environment backup before deployment
+
+#     Branch-based Triggers: Different behavior for main vs feature branches
+
+#     Artifact Separation: Separate artifacts for packed solution and source files
+
+#     Multi-stage Deployment: Clear separation of TEST and PROD deployments
+
+# Troubleshooting Tips
+
+#     If you get authentication errors:
+
+#         Verify the service principal has System Administrator role in target environments
+
+#         Check that the service connection is properly configured
+
+#     For timeout issues:
+
+#         Increase the MaxAsyncWaitTime parameter for large solutions
+
+#         Consider splitting very large solutions into smaller ones
+
+#     For dependency errors:
+
+#         Review all solution dependencies before deployment
+
+#         Ensure referenced solutions are already deployed to target environment
+
+# This implementation follows the video's approach while adding enterprise-grade features for reliable Power Platform solution deployments.
+
+
+

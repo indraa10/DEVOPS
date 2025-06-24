@@ -1,0 +1,141 @@
+# Step 1: Set Up Power Platform Build Tools
+
+#     Install the Power Platform Build Tools extension from Azure DevOps Marketplace.
+
+#     Create a service connection to your Power Platform environment:
+
+#         Go to Project Settings > Service connections
+
+#         Create a new "Power Platform" service connection
+
+#         Provide credentials and environment URL
+
+---
+# Step 2: Create CI Pipeline (Build)
+
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- task: PowerPlatformToolInstaller@2
+  displayName: 'Install Power Platform CLI'
+
+- task: PowerPlatformExportSolution@2
+  displayName: 'Export Solution'
+  inputs:
+    authenticationType: 'PowerPlatformSPN'
+    PowerPlatformSPN: 'Your-Service-Connection-Name'
+    Environment: 'https://your-environment.crm.dynamics.com'
+    SolutionName: 'YourSolutionName'
+    SolutionOutputFile: '$(Build.ArtifactStagingDirectory)\YourSolutionName.zip'
+
+- task: PowerPlatformUnpackSolution@2
+  displayName: 'Unpack Solution'
+  inputs:
+    SolutionInputFile: '$(Build.ArtifactStagingDirectory)\YourSolutionName.zip'
+    SolutionTargetFolder: '$(Build.SourcesDirectory)\SolutionFiles'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+
+---
+
+# Step 3: Create CD Pipeline (Release)
+
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- download: current
+  artifact: drop
+
+- task: PowerPlatformToolInstaller@2
+  displayName: 'Install Power Platform CLI'
+
+- task: PowerPlatformPackSolution@2
+  displayName: 'Pack Solution'
+  inputs:
+    SolutionSourceFolder: '$(System.DefaultWorkingDirectory)\SolutionFiles'
+    SolutionTargetFile: '$(System.DefaultWorkingDirectory)\YourSolutionName.zip'
+
+- task: PowerPlatformImportSolution@2
+  displayName: 'Import Solution'
+  inputs:
+    authenticationType: 'PowerPlatformSPN'
+    PowerPlatformSPN: 'Your-Service-Connection-Name'
+    Environment: 'https://your-target-environment.crm.dynamics.com'
+    SolutionInputFile: '$(System.DefaultWorkingDirectory)\YourSolutionName.zip'
+    OverwriteUnmanagedCustomizations: true
+    SkipDependencyCheck: false
+    AsyncOperation: true
+    MaxAsyncWaitTime: '60'
+
+---
+
+# Advanced Configuration Options
+# Environment Variables
+
+# Store sensitive information in Azure DevOps variables or variable groups:
+
+#     Go to Pipelines > Library
+
+#     Create variable groups for different environments
+
+#     Reference them in your pipelines with $(variableName)
+
+# Quality Gates
+
+# Add approval gates between environments:
+
+#     In your release pipeline, click on the pre-deployment conditions
+
+#     Enable approvals and specify approvers
+
+---
+
+# automated Testing 
+
+- task: PowerPlatformRunTestAutomation@2
+  displayName: 'Run Test Automation'
+  inputs:
+    authenticationType: 'PowerPlatformSPN'
+    PowerPlatformSPN: 'Your-Service-Connection-Name'
+    Environment: 'https://your-environment.crm.dynamics.com'
+    TestAutomationFile: '$(System.DefaultWorkingDirectory)\TestAutomation.json'
+
+# Best Practices
+
+#     Source Control: Maintain all solution components in source control with proper branching strategy
+
+#     Incremental Deployments: Deploy small changes frequently rather than large updates
+
+#     Environment Strategy: Have separate DEV, TEST, UAT, and PROD environments
+
+#     Backup: Always backup target environments before major deployments
+
+#     Monitoring: Set up pipeline notifications and monitor deployment history
+
+# Troubleshooting
+
+#     Authentication Errors: Verify service principal permissions in Power Platform
+
+#     Timeout Issues: Increase async wait time for large solutions
+
+#     Dependency Errors: Review solution dependencies before deployment
+
+#     Version Conflicts: Ensure solution versions increment properly
+
+# By implementing this CI/CD pipeline, you'll achieve automated, reliable deployments of your Dynamics 365 and Power Platform solutions with proper version control and deployment tracking.
+
+---
+
