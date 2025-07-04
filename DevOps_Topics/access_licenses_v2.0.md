@@ -681,3 +681,236 @@ Here is a **comprehensive list** of all tools, integrations, service connections
 ---
 
 Would you like this in **Excel**, **Word**, or **draw\.io diagram** format as well?
+
+# access level in tabular form
+
+Here’s a **detailed comparison** of the **Azure DevOps access levels**: **Basic**, **Stakeholder**, and **Visual Studio Subscription**.
+
+---
+
+## 🔄 Azure DevOps Access Level Comparison
+
+| Feature / Capability               | **Stakeholder (Free)** | **Basic (Free for 5 users)**  | **Visual Studio Subscriber**      |
+| ---------------------------------- | ---------------------- | ----------------------------- | --------------------------------- |
+| **Boards (Work Items)**            | ✅ Full access          | ✅ Full access                 | ✅ Full access                     |
+| - Create/Edit Work Items           | ✅                      | ✅                             | ✅                                 |
+| - Backlogs & Boards                | ✅                      | ✅                             | ✅                                 |
+| - Sprints & Queries                | ✅                      | ✅                             | ✅                                 |
+| - Delivery Plans                   | ❌                      | ✅                             | ✅                                 |
+| **Repositories (Azure Repos)**     | ❌ Read-only            | ✅ Full access                 | ✅ Full access                     |
+| - Clone/Pull                       | ✅ (if public project)  | ✅                             | ✅                                 |
+| - Push/PRs/Branching               | ❌                      | ✅                             | ✅                                 |
+| **Pipelines (Build & Release)**    | ❌ View only            | ✅ Full use                    | ✅ Full use                        |
+| - Run Pipelines                    | ❌                      | ✅                             | ✅                                 |
+| - Edit Pipelines                   | ❌                      | ✅                             | ✅                                 |
+| **Artifacts (NuGet/npm feeds)**    | ❌                      | ✅                             | ✅                                 |
+| - Publish/Consume Packages         | ❌                      | ✅                             | ✅                                 |
+| **Test Plans**                     | ❌                      | ❌ (needs extension)           | ❌ (needs extension)               |
+| - View Test Plans                  | ❌                      | ❌                             | ❌                                 |
+| - Create/Run Manual Tests          | ❌                      | 🔒 Needs "Basic + Test Plans" | 🔒 Needs "Test Manager Extension" |
+| **Dashboards / Widgets**           | ✅ View & basic config  | ✅ Full config                 | ✅ Full config                     |
+| **Access to Extensions**           | Limited                | ✅ Full access                 | ✅ Full access                     |
+| **Azure DevOps CLI Access**        | ❌                      | ✅                             | ✅                                 |
+| **Advanced Reporting & Analytics** | ❌                      | ✅                             | ✅                                 |
+| **Permissions Management**         | ❌                      | ✅ (with project admin role)   | ✅                                 |
+| **Service Connection Management**  | ❌                      | ✅                             | ✅                                 |
+
+---
+
+## 💰 Cost Summary
+
+| Access Level                   | Price                                                |
+| ------------------------------ | ---------------------------------------------------- |
+| **Stakeholder**                | ✅ Free (unlimited users)                             |
+| **Basic**                      | ✅ Free for first 5 users; \$6/user/month beyond that |
+| **Visual Studio Subscription** | 💰 Depends on tier (see below)                       |
+
+---
+
+## 🎓 Visual Studio Subscription Levels (Auto-grant Azure DevOps Basic)
+
+| Subscription Type              | Azure DevOps Level   | Additional Benefits                           |
+| ------------------------------ | -------------------- | --------------------------------------------- |
+| **Visual Studio Professional** | ✅ Basic              | + Azure credits, VS license                   |
+| **Visual Studio Enterprise**   | ✅ Basic + Test Plans | + IntelliTest, Load Testing, Priority Support |
+| **MSDN Subscribers (legacy)**  | ✅ Basic              | legacy support remains                        |
+
+---
+
+## ✅ Recommended Use Cases
+
+| Role                             | Recommended Access                                    |
+| -------------------------------- | ----------------------------------------------------- |
+| Product Owner / Business Analyst | **Stakeholder**                                       |
+| Developer                        | **Basic** or **Visual Studio Subscription**           |
+| DevOps Engineer                  | **Basic** or **Visual Studio Enterprise**             |
+| Tester (Manual)                  | **Basic + Test Plans** or **Enterprise Subscription** |
+| Project Manager / Scrum Master   | **Stakeholder** or **Basic** (for dashboards/reports) |
+
+---
+
+## 🔐 Summary Table: Key Feature Access
+
+| Feature        | Stakeholder | Basic              | VS Subscription     |
+| -------------- | ----------- | ------------------ | ------------------- |
+| Work Items     | ✅           | ✅                  | ✅                   |
+| Git Repos      | ❌           | ✅                  | ✅                   |
+| Pipelines      | ❌           | ✅                  | ✅                   |
+| Artifacts      | ❌           | ✅                  | ✅                   |
+| Dashboards     | ✅           | ✅                  | ✅                   |
+| Manual Testing | ❌           | ❌ (requires addon) | ✅ (Enterprise only) |
+
+---
+
+Would you like this exported as a **PDF table**, **Excel matrix**, or **policy guide** for team onboarding?
+
+
+Here’s a detailed comparison of the three **Azure DevOps access levels**—**Basic**, **Stakeholder**, and **Visual Studio Subscription**—covering permissions, features, costs, and use cases:
+
+---
+
+### **1. Stakeholder (Free)**
+#### **Who It’s For**:  
+- Non-technical users (e.g., product owners, business analysts).  
+- External collaborators (vendors, clients).  
+
+#### **Permissions & Features**:  
+| **Feature**                     | **Access** |
+|---------------------------------|-----------|
+| **View work items**             | ✅ Yes    |
+| **Edit work items**             | ✅ Yes    |
+| **Create/edit backlogs/boards** | ✅ Yes    |
+| **Dashboards**                  | ✅ Yes    |
+| **Pipelines (CI/CD)**           | ❌ No (Cannot run/edit pipelines) |
+| **Code Repos**                  | ❌ Read-only (no commits) |
+| **Test Plans**                  | ❌ No     |
+| **Artifacts**                   | ❌ No     |
+
+#### **Limitations**:  
+- Cannot contribute to code or pipelines.  
+- Ideal for tracking progress without technical involvement.  
+
+#### **Cost**:  
+- **Free** (unlimited users).  
+
+---
+
+### **2. Basic ($6/user/month)**
+#### **Who It’s For**:  
+- Developers, testers, and technical contributors.  
+
+#### **Permissions & Features**:  
+| **Feature**                     | **Access** |
+|---------------------------------|-----------|
+| **Full work item management**   | ✅ Yes    |
+| **Pipelines (CI/CD)**           | ✅ Full access |
+| **Code Repos**                  | ✅ Full Git/TFVC access |
+| **Test Plans**                  | ❌ No (requires separate Test Plans license) |
+| **Artifacts**                   | ✅ Yes    |
+| **Dashboards**                  | ✅ Yes    |
+
+#### **Limitations**:  
+- No **Test Plans** (requires add-on).  
+- No **Azure Artifacts** for private feeds (unless paid).  
+
+#### **Cost**:  
+- **$6/user/month** (billed monthly).  
+
+---
+
+### **3. Visual Studio Subscription (Included)**
+#### **Who It’s For**:  
+- Licensed Visual Studio subscribers (Enterprise/Professional).  
+
+#### **Permissions & Features**:  
+| **Feature**                     | **Access** |
+|---------------------------------|-----------|
+| **All Basic features**          | ✅ Yes    |
+| **Test Plans**                  | ✅ Included (if VS Enterprise) |
+| **Azure Artifacts**             | ✅ Free tier (2 GB storage) |
+| **Parallel Jobs (CI/CD)**       | ✅ Extra free jobs (VS Enterprise: 1 free job) |
+
+#### **Limitations**:  
+- Requires an active **Visual Studio subscription** (not just Azure DevOps).  
+
+#### **Cost**:  
+- **Included** with:  
+  - **Visual Studio Professional** (~$45/month).  
+  - **Visual Studio Enterprise** (~$250/month).  
+
+---
+
+### **4. Key Differences Summary**
+| **Feature**                | **Stakeholder** | **Basic** | **Visual Studio Subscriber** |
+|----------------------------|----------------|----------|-----------------------------|
+| **Cost**                   | Free           | $6/user  | Included in VS license      |
+| **Edit Work Items**        | ✅             | ✅       | ✅                          |
+| **Run Pipelines**          | ❌             | ✅       | ✅                          |
+| **Code Repos (Commit)**    | ❌             | ✅       | ✅                          |
+| **Test Plans**             | ❌             | ❌       | ✅ (Enterprise only)        |
+| **Artifacts**              | ❌             | Limited  | ✅ (2 GB free)              |
+| **Parallel CI/CD Jobs**    | ❌             | 1 free   | +1 free (Enterprise)       |
+
+---
+
+### **5. When to Use Which?**
+- **Stakeholder**:  
+  - For **non-technical teams** who only need to track progress.  
+  - Example: Product owners reviewing sprint backlogs.  
+
+- **Basic**:  
+  - For **developers/testers** needing full repo/pipeline access.  
+  - Example: A DevOps engineer setting up CI/CD.  
+
+- **Visual Studio Subscription**:  
+  - For **licensed VS users** who want **free Test Plans/Artifacts**.  
+  - Example: An Enterprise team using Azure Test Plans.  
+
+---
+
+### **6. Upgrade Scenarios**
+- **Stakeholder → Basic**: Needed when a user starts contributing to code/pipelines.  
+- **Basic → VS Subscription**: Saves costs if the user already has a VS license.  
+
+---
+
+### **7. Licensing Example**
+| **Team Size** | **Recommended License** | **Monthly Cost** |
+|---------------|-------------------------|------------------|
+| 5 devs + 2 stakeholders | 5 × Basic ($30) + 2 × Free | $30 |
+| 10 devs (all VS Enterprise) | 0 (included in VS) | $0 (already paid via VS) |
+
+---
+
+**Final Tip**:  
+- Use **Stakeholder** for read-only access.  
+- Use **Basic** for full technical access.  
+- Leverage **VS Subscriptions** to save costs if your team already has them.  
+
+Need help assigning licenses? Let me know! 🚀
+
+
+Feature / Capability	Stakeholder (Free)	Basic (Free for 5 users)	Visual Studio Subscriber
+Boards (Work Items)	✅	✅	✅
+Create/Edit Work Items	✅	✅	✅
+Backlogs & Boards	✅	✅	✅
+Sprints & Queries	✅	✅	✅
+Delivery Plans	❌	✅	✅
+Repositories (Azure Repos)	❌	✅	✅
+Clone/Pull	✅ (if public)	✅	✅
+Push/PRs/Branching	❌	✅	✅
+Pipelines (Build & Release)	❌	✅	✅
+Run Pipelines	❌	✅	✅
+Edit Pipelines	❌	✅	✅
+Artifacts (NuGet/npm feeds)	❌	✅	✅
+Publish/Consume Packages	❌	✅	✅
+Test Plans	❌	❌ (addon required)	❌ (addon/Test Manager)
+View Test Plans	❌	❌	❌
+Create/Run Manual Tests	❌	🔒	🔒
+Dashboards / Widgets	✅	✅	✅
+Access to Extensions	Limited	✅	✅
+Azure DevOps CLI Access	❌	✅	✅
+Advanced Reporting & Analytics	❌	✅	✅
+Permissions Management	❌	✅	✅
+Service Connection Management	❌	✅	✅
+![image](https://github.com/user-attachments/assets/8ebfe9ef-a012-423b-90a3-49ad723a0c36)
