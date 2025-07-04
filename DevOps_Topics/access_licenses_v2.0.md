@@ -991,7 +991,138 @@ Here's a breakdown of the **minimum Azure AD and Azure RBAC roles** required to 
   *Why?*: Allows creating Key Vaults but **not accessing secrets**.  
 
 **Post-Creation**:  
-- To add secrets, assign **Key Vault Secrets Officer** (`Microsoft.KeyVault/vaults/secrets/write`).  
+- To add secrets, assign **Key Vault Secrets Officer** (`Microsoft.KeyVault/vaults/secrets/write`).
+- 
+
+# ------------------------------------------------------
+
+combined :
+
+Certainly! Here’s a compact, well-organized README.md based on the content of DevOps_Topics/access_licenses_v2.0.md, with similar items grouped and redundant info removed. This delivers a clear, reference-friendly summary for your DevOps solution with Dynamics 365, Azure DevOps, and Power Platform.
+
+---
+
+# DevOps Solution: Tools, Access, and Licensing Overview
+
+This document summarizes all major tools, integrations, infrastructure, licensing, and costs needed for CI/CD, automated testing, and artifact management for Dynamics 365/Power Platform projects using Azure DevOps.
+
+---
+
+## 1. Core Tools & Services
+
+| Category          | Tool/Service                                   | Purpose/Notes                                    |
+|-------------------|------------------------------------------------|--------------------------------------------------|
+| Source Control    | Azure Repos, GitHub                            | Version control for code and solution components  |
+| CI/CD             | Azure Pipelines, Power Platform Build Tools    | Build, deploy, automate solution lifecycle       |
+| Artifact Mgmt     | Azure Artifacts, JFrog Artifactory (optional)  | Store/publish NuGet, npm, solution packages      |
+| Project Mgmt      | Azure Boards                                   | Agile planning, backlogs, dashboards             |
+| Testing           | Azure Test Plans, PowerApps Test Studio        | Manual/automated testing, test management        |
+| IDE & Dev Tools   | Visual Studio, Power Platform CLI, Solution Packager | Plugin and extension development          |
+| Security (SAST)   | SonarQube, Microsoft Security DevOps, CodeQL   | Static code analysis                             |
+| Security (DAST)   | OWASP ZAP, Burp Suite, HCL AppScan            | Dynamic security testing                         |
+| Monitoring        | Azure Application Insights                     | Pipeline/app monitoring and logging              |
+| Infrastructure    | Azure VMs, App Service, Functions, Containers  | Hosts for builds, custom APIs, or self-hosted agents |
+
+---
+
+## 2. Integrations & Service Connections
+
+| Integration Type         | Description                                                           |
+|-------------------------|-----------------------------------------------------------------------|
+| Azure Resource Manager   | Deploy/manage Azure resources from pipelines (needs Service Principal)|
+| Power Platform Service   | Pipeline access to Dataverse/Dynamics (needs App Registration/SPN)    |
+| GitHub                  | Source repo or security scanning integration                          |
+| 3rd-Party Extensions    | SAST/DAST tools, Artifactory, Slack, Beagle Security, etc.            |
+| Key Vault               | Securely store/retrieve secrets in pipelines                          |
+
+---
+
+## 3. Infrastructure & Environments
+
+- **Azure DevOps Organization**: Central hub for all DevOps services and users.
+- **Environment Isolation**: Separate Dev, Test, UAT, and Prod environments in Power Platform/Dynamics 365 and Azure.
+- **Pipeline Agents**: Use Microsoft-hosted (default) or self-hosted (VM-based, for custom/network needs).
+
+---
+
+## 4. Access & Permissions
+
+| Task/Resource         | Required Access/Role                                       |
+|----------------------|------------------------------------------------------------|
+| Azure DevOps         | Basic (full), Stakeholder (work items only), VS Subscriber |
+| Azure Resources      | Contributor, Network Contributor, Key Vault Contributor    |
+| App Registration     | Application/Cloud Application Administrator                |
+| Service Principal    | For service connections and automation                     |
+| Power Platform       | Appropriate D365/Power Apps license, Service Principal     |
+| 3rd-Party Apps       | API keys/tokens as needed                                  |
+
+---
+
+## 5. Licensing & Costs (Typical, as of 2024)
+
+| Product/Service             | Notes/Details                                        | Est. Cost (USD)              |
+|-----------------------------|------------------------------------------------------|------------------------------|
+| Azure DevOps - Basic        | 5 users free, then $6/user/mo                        | $6/user/mo                   |
+| Azure DevOps - Pipelines    | 1 Microsoft-hosted job free; more at $40/job/mo      | $40/job/mo                   |
+| Azure DevOps - Artifacts    | 2 GB free, then $2/GB/mo                             | $2/GB/mo                     |
+| Azure Test Plans            | Manual/automated tests, $52/user/mo                  | $52/user/mo                  |
+| Visual Studio Professional  | Includes DevOps access, $45-99/mo (see MS pricing)   | $45–99/mo                    |
+| Power Apps per user         | App use & development                                | $20/user/mo                  |
+| Power Automate              | Per user or per flow                                 | $15–40/user/mo               |
+| Dynamics 365 (sample)       | Varies by module (Sales, Service, etc.)              | $95–190/user/mo              |
+| Azure Resources             | Pay-as-you-go (VMs, App Service, Key Vault, Storage) | Varies by usage              |
+| SAST/DAST Tools             | SonarQube (OSS: free), Burp Suite ($400+/yr), others | $0–10K+/yr                   |
+| 3rd-Party Apps              | JFrog, Beagle, Slack, Chef, etc.                     | Subscription/usage-based     |
+
+---
+
+## 6. Access Level Matrix (Azure DevOps)
+
+| Capability / Access           | Stakeholder (Free) | Basic (1st 5 free) | Visual Studio Subscriber |
+|------------------------------|--------------------|--------------------|-------------------------|
+| Boards/Work Items            | ✅                 | ✅                 | ✅                      |
+| Repos (Git/TFVC)             | ❌ (read-only)     | ✅                 | ✅                      |
+| Pipelines                    | ❌                 | ✅                 | ✅                      |
+| Artifacts                    | ❌                 | ✅                 | ✅                      |
+| Test Plans                   | ❌                 | ❌ (add-on)        | ✅ (Enterprise only)     |
+| Service Connection Mgmt.     | ❌                 | ✅                 | ✅                      |
+
+---
+
+## 7. Task-Based Azure RBAC Role Reference
+
+| Task                    | Minimum Azure Role(s)         | Scope               |
+|-------------------------|------------------------------|---------------------|
+| Create VM               | Contributor                  | Resource Group      |
+| Create VNet/Subnet/NSG  | Network Contributor          | Resource Group/VNet |
+| Create Key Vault        | Key Vault Contributor        | Resource Group      |
+| App Registration/SPN    | Application (or Cloud) Admin | Azure AD Tenant     |
+| Assign SP to resources  | User Access Administrator    | Resource Group      |
+
+---
+
+## 8. Key Recommendations
+
+- Use the Azure Pricing Calculator and MS Licensing Guide for latest costs.
+- Assign least privilege RBAC roles.
+- Integrate SAST/DAST in CI/CD for security.
+- Start with free tiers and scale as needed.
+- Use service principals and Key Vault for automation security.
+
+---
+
+## References
+
+- [Power Platform ALM Guide](https://learn.microsoft.com/en-us/power-platform/alm/)
+- [Azure DevOps Pricing](https://azure.microsoft.com/en-us/pricing/details/devops/azure-devops-services/)
+- [Dynamics 365 Pricing](https://www.microsoft.com/en-us/dynamics365/pricing)
+- [Azure Pricing Calculator](https://azure.microsoft.com/en-us/pricing/calculator/)
+- [Power Platform Build Tools](https://learn.microsoft.com/en-us/power-platform/alm/devops-build-tools)
+- [OWASP ZAP Azure Pipeline Integration](https://www.zaproxy.org/docs/automate/azure-pipelines/)
+
+---
+
+**For tailored guidance or a cost breakdown for your team, provide your team size and expected usage.**
 
 ---
 
