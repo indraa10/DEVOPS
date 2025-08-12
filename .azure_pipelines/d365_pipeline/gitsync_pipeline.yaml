@@ -1,0 +1,33 @@
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  mainBranch: 'main'
+  compareBranch: 'feature'
+
+steps:
+  - checkout: self
+    persistCredentials: true
+
+  - script: |
+      git fetch origin ${{ variables.mainBranch }}
+      git fetch origin ${{ variables.compareBranch }}
+
+      echo "Comparing ${{ variables.mainBranch }} with ${{ variables.compareBranch }}"
+
+      # List added, deleted, and modified files
+      echo "Added files:"
+      git diff --name-status origin/${{ variables.mainBranch }}..origin/${{ variables.compareBranch }} | grep '^A' || echo "None"
+
+      echo "Deleted files:"
+      git diff --name-status origin/${{ variables.mainBranch }}..origin/${{ variables.compareBranch }} | grep '^D' || echo "None"
+
+      echo "Modified files:"
+      git diff --name-status origin/${{ variables.mainBranch }}..origin/${{ variables.compareBranch }} | grep '^M' || echo "None"
+
+      # Show changes for modified files
+      echo "Detailed changes:"
+      git diff origin/${{ variables.mainBranch }}..origin/${{ variables.compareBranch }}
+    displayName: 'Compare branches and show changes'
